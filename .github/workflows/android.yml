@@ -8,6 +8,8 @@ on:
 jobs:
   build-apk:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,3 +43,14 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
+      # Raw APK download (no zip wrapper) via GitHub Release
+      - name: Attach APK to Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          tag: debug-apk
+          name: Debug APK (latest)
+          body: Latest debug build. Download app-debug.apk directly, then allow "install from unknown sources" on your phone.
+          artifacts: android/app/build/outputs/apk/debug/app-debug.apk
+          allowUpdates: true
+          artifactErrorsFailBuild: false
+          token: ${{ secrets.GITHUB_TOKEN }}

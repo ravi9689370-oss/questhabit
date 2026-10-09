@@ -101,30 +101,46 @@ function syncTabBar() {
 }
 
 async function boot() {
-  const state = await load();
-  setLang(state.settings.lang || 'en');
-  applyTheme();
-  watchTheme();
-  buildTabBar();
+  try {
+    const state = await load();
+    setLang(state.settings.lang || 'en');
+    applyTheme();
+    watchTheme();
+    buildTabBar();
 
-  // re-render on state change (lightweight: only re-highlight; screens render themselves)
-  subscribe(() => { syncTabBar(); });
+    // re-render on state change (lightweight: only re-highlight; screens render themselves)
+    subscribe(() => { syncTabBar(); });
 
-  const originalRender = render;
-  // wrap render to keep tab highlight in sync
-  window.addEventListener('hashchange', () => {
+    // keep tab highlight in sync
+    window.addEventListener('hashchange', () => {
+      highlightTab();
+      syncTabBar();
+    });
+
+    startRouter();
     highlightTab();
     syncTabBar();
-  });
 
-  startRouter();
-  highlightTab();
-  syncTabBar();
-
-  // global error boundary — honest logging, no silent failures
-  window.addEventListener('error', (e) => {
-    console.error('App error:', e.error ?? e.message);
-  });
+    // global error boundary — honest logging + visible notice (no silent failure)
+    window.addEventListener('error', (e) => {
+      console.error('App error:', e.error ?? e.message);
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      console.error('Unhandled promise:', e.reason);
+    });
+  } catch (err) {
+    console.error('Boot failed:', err);
+    const app = document.getElementById('app');
+    if (app) {
+      app.innerHTML = `
+        <div class="screen center-screen">
+          <div class="done-art">⚠️</div>
+          <h1>Something went wrong</h1>
+          <p class="muted">${String(err?.message ?? err).slice(0, 200)}</p>
+          <button class="btn btn-primary" onclick="location.reload()">Reload</button>
+        </div>`;
+    }
+  }
 }
 
 boot();

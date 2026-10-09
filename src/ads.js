@@ -1,47 +1,47 @@
 // AdMob wrapper. Real rewarded ads on Android; honest no-op on web.
-// The plugin is loaded at RUNTIME only (variable import + @vite-ignore).
-// On Android, install: npm install @capacitor-community/admob
+// Static import so the plugin's native bridge is bundled for Android.
+import { AdMob } from '@capacitor-community/admob';
 import { isNative } from './platform.js';
 
-const ADMOB_MODULE = '@capacitor-community/admob';
-// TODO-free: replace with YOUR AdMob rewarded ad unit id before release.
+// Replace with YOUR AdMob rewarded ad unit id before release.
 const REWARDED_UNIT_ID = 'ca-app-pub-3940256099942544/5224354917'; // Google test unit
-let admob = null;
-let tried = false;
+let initialized = false;
 
-async function loadAdmob() {
-  if (!isNative()) return null;
-  if (tried) return admob;
-  tried = true;
+async function ensureInit() {
+  if (initialized) return true;
   try {
-    const mod = await import(/* @vite-ignore */ ADMOB_MODULE);
-    await mod.AdMob.initialize({ requestTrackingAuthorization: false });
-    admob = mod;
-    return mod;
+    await AdMob.initialize({ requestTrackingAuthorization: false });
+    initialized = true;
+    return true;
   } catch (e) {
-    console.warn('AdMob plugin not installed — ads disabled', e);
-    admob = null;
-    return null;
+    console.warn('AdMob init failed', e);
+    return false;
   }
 }
 
 // Shows a rewarded ad; resolves { ok: true } only when the reward is earned.
 export async function showRewardedAd() {
-  const mod = await loadAdmob();
-  if (!mod) return { ok: false, reason: 'web' };
+  if (!isNative()) return { ok: false, reason: 'web' };
   try {
-    const { AdMob } = mod;
+    if (!(await ensureInit())) return { ok: false, reason: 'init-failed' };
+
     await AdMob.loadRewardedAd({ adUnitId: REWARDED_UNIT_ID });
 
     const earned = await new Promise((resolve) => {
       let done = false;
-      const finish = (val) => { if (!done) { done = true; cleanup(); resolve(val); } };
-      const listenPromise = AdMob.addListener('rewardedAdEarned', () => finish(true));
+      let listenPromise;
       const cleanup = () => {
         clearTimeout(timer);
-        Promise.resolve(listenPromise).then((h) => { try { h?.remove?.(); } catch (e) { /* noop */ } }).catch(() => {});
+        Promise.resolve(listenPromise).then((h) => {
+          try { h?.remove?.(); } catch (e) { /* noop */ }
+        }).catch(() => {});
       };
-      const timer = setTimeout(() => finish(false), 60000);
+      listenPromise = AdMob.addListener('rewardedAdEarned', () => {
+        if (!done) { done = true; cleanup(); resolve(true); }
+      });
+      const timer = setTimeout(() => {
+        if (!done) { done = true; cleanup(); resolve(false); }
+      }, 60000);
     });
 
     try {

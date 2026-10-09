@@ -1,0 +1,9 @@
+{
+  "appId": "com.ravi9689370oss.questhabit",
+  "appName": "QuestHabit",
+  "webDir": "dist",
+  "backgroundColor": "#10131a",
+  "android": {
+    "allowMixedContent": false
+  }
+}

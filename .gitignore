@@ -1,7 +1,10 @@
 node_modules
 dist
-android
 .idea
 .vscode
 *.log
 .DS_Store
+# Never commit secrets/keystores
+android/key.properties
+android/release.keystore
+android/app/release.keystore

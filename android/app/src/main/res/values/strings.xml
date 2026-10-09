@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">QuestHabit</string>
+    <string name="title_activity_main">QuestHabit</string>
+    <string name="package_name">com.ravi9689370oss.questhabit</string>
+    <string name="custom_url_scheme">com.ravi9689370oss.questhabit</string>
+</resources>

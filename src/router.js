@@ -1,12 +1,18 @@
-// Tiny hash router with auth/onboarding guard.
+// Tiny hash router with :param support and onboarding guard.
 import { getState } from './store.js';
+import { applyI18n } from './i18n.js';
 
-const routes = new Map();
+const routes = new Map(); // pattern -> { regex, keys, handler }
 let currentCleanup = null;
 let notFoundHandler = null;
 
 export function route(path, handler) {
-  routes.set(path, handler);
+  const keys = [];
+  const regexStr = path.replace(/:[^/]+/g, (m) => {
+    keys.push(m.slice(1));
+    return '([^/]+)';
+  });
+  routes.set(path, { regex: new RegExp('^' + regexStr + '$'), keys, handler });
 }
 
 export function setNotFound(handler) {
@@ -42,10 +48,19 @@ export function render() {
     return;
   }
 
-  const handler = routes.get(path) ?? notFoundHandler;
-  if (!handler) return;
-  const cleanup = handler(root, path) || null;
-  if (typeof cleanup === 'function') currentCleanup = cleanup;
+  for (const [pattern, { regex, handler }] of routes) {
+    if (regex.test(path)) {
+      const cleanup = handler(root, path) || null;
+      if (typeof cleanup === 'function') currentCleanup = cleanup;
+      applyI18n(document);
+      return;
+    }
+  }
+  if (notFoundHandler) {
+    const cleanup = notFoundHandler(root, path) || null;
+    if (typeof cleanup === 'function') currentCleanup = cleanup;
+    applyI18n(document);
+  }
 }
 
 export function startRouter() {

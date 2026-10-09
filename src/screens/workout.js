@@ -76,7 +76,7 @@ export default function render(root, path) {
 
   function fmtTime(sec) {
     const m = Math.floor(sec / 60);
-    const s = sec % 60;
+    const s = Math.floor(sec % 60);
     return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   }
 
@@ -93,12 +93,11 @@ export default function render(root, path) {
     const ex = EXERCISES[exIndex];
     $('phase-text').textContent = phase === 'rest' ? `${t('rest')} ${REST_SECONDS}s` : `${t('work')} · ${ex.id.replace(/_/g, ' ')}`;
     $('exercise-figure').innerHTML = exerciseSVG(ex.id, 170);
-    $('exercise-figure').firstElementChild?.classList?.add?.('playing');
     $('rest-overlay').hidden = phase !== 'rest';
-    // rep counting via CSS animationiteration
-    const fig = $('exercise-figure').firstElementChild;
-    if (fig && phase === 'work') {
-      fig.addEventListener('animationiteration', () => {
+    // rep counting via CSS animationiteration on the animated <g>
+    const exEl = $('exercise-figure').querySelector('.ex');
+    if (exEl && phase === 'work') {
+      exEl.addEventListener('animationiteration', () => {
         if (!running || finished) return;
         reps += 1;
         vibrate(10);
@@ -109,13 +108,18 @@ export default function render(root, path) {
   }
 
   function switchPhase() {
+    // always clear any running rest timer and reset the work clock
+    if (intervalTimer) { clearInterval(intervalTimer); intervalTimer = null; }
+    phaseElapsed = 0;
+
     if (phase === 'work') {
       phase = 'rest';
       let restLeft = REST_SECONDS;
       $('rest-count').textContent = restLeft;
       intervalTimer = setInterval(() => {
         restLeft -= 1;
-        $('rest-count').textContent = Math.max(0, restLeft);
+        const el = document.getElementById('rest-count');
+        if (el) el.textContent = Math.max(0, restLeft);
         if (restLeft <= 0) {
           clearInterval(intervalTimer);
           intervalTimer = null;
@@ -195,8 +199,9 @@ export default function render(root, path) {
 
     const mins = (totalSeconds - remaining) / 60;
     const diff = DIFFICULTY[habit.difficulty || 'easy'];
-    const xpGain = Math.round(diff.xp * (mins / Math.max(1, habit.duration)) * 2);
-    const goldGain = Math.round(diff.gold * (mins / Math.max(1, habit.duration)) * 2);
+    const ratio = Math.max(0.05, Math.min(1, mins / Math.max(1, habit.duration)));
+    const xpGain = Math.max(1, Math.round(diff.xp * ratio * 2));
+    const goldGain = Math.max(1, Math.round(diff.gold * ratio * 2));
 
     // rewards
     addXp(xpGain);

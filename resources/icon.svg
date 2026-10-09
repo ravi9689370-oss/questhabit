@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10131a"/>
+      <stop offset="1" stop-color="#1c2433"/>
+    </linearGradient>
+    <linearGradient id="sword" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fde68a"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- growth arrow (habit) -->
+  <path d="M120 330 L205 245 L265 305 L350 190" fill="none" stroke="#4ade80" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M296 182 L352 188 L346 244" fill="none" stroke="#4ade80" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- sword -->
+  <g transform="rotate(24 300 300)">
+    <rect x="286" y="120" width="26" height="180" rx="12" fill="url(#sword)"/>
+    <path d="M270 118 L328 118 L300 66 Z" fill="#fde68a"/>
+    <rect x="252" y="300" width="92" height="22" rx="11" fill="#8b5cf6"/>
+    <rect x="292" y="322" width="14" height="70" rx="7" fill="#64748b"/>
+    <circle cx="299" cy="402" r="16" fill="#475569"/>
+  </g>
+  <!-- sparkles -->
+  <circle cx="120" cy="140" r="10" fill="#fbbf24"/>
+  <circle cx="410" cy="120" r="7" fill="#4ade80"/>
+  <circle cx="430" cy="400" r="9" fill="#fbbf24"/>
+</svg>

@@ -6,12 +6,26 @@ _Last updated: 2026-10-09_
 
 - [x] Full app source (13 screens, game engine, animations, i18n, themes)
 - [x] `npm run build` — clean, zero errors
-- [x] All source files pass `node --check`
-- [x] Capacitor Android platform added locally
+- [x] Headless E2E smoke test — **24/24 checks pass**
+      (onboarding → hero → habit CRUD → animated workout with
+      rep counting → boss → shop → quests → screenshots)
 - [x] GitHub repo: **ravi9689370-oss/questhabit** (public)
-- [x] GitHub Pages **LIVE**: https://ravi9689370-oss.github.io/questhabit/ (HTTP 200, verified)
-- [x] Android debug APK built in CI: **app-debug-apk artifact (8.9 MB)** — verified download
-- [x] Play Store submission pack in `store/` (11 files)
+- [x] GitHub Pages **LIVE**: https://ravi9689370-oss.github.io/questhabit/ (HTTP 200)
+- [x] Android debug APK built in CI: **app-debug-apk (8.3 MB)** — verified
+- [x] **Custom adaptive app icon inside APK** (all densities, byte-match verified)
+- [x] Play Store pack in `store/` (listing, privacy policy md+html, data safety,
+      ratings, audience, ads, access, declarations, graphics specs, console
+      checklist) + 7 real app screenshots + 512px icon
+
+## 🐛 Bugs found & fixed (2026-10-09)
+
+- Router had no `:param` matching → workout screen 404'd (headline feature broken)
+- Rest overlay CSS overrode `hidden` → blocked ALL workout button taps
+- `data-i18n` never applied after render → buttons/tab labels were empty
+- Workout rest/work phase flap created infinite intervals (memory leak)
+- Timer showed fractional seconds (`19:55.96`)
+- Duplicate `ic_launcher_background` resource broke the Gradle build
+- Icon generation wired into CI (`scripts/generate-icons.mjs`)
 
 ## 🔗 Links
 
@@ -30,11 +44,5 @@ _Last updated: 2026-10-09_
 5. **Signed AAB for production** (debug APK is for testing only):
    generate upload keystore, add signing to `android/app/build.gradle`,
    `./gradlew bundleRelease` → upload AAB. **BACK UP keystore + passwords.**
-6. App icons/screenshots: generate per `store/graphics_specs.md`
-
-## 📝 Notes
-
-- `@capacitor-community/in-app-purchases` was removed from npm; billing.js loads
-  it at runtime only (web build unaffected). Install it locally if you need IAP.
-- Local environment: aarch64 with x86_64 Android SDK tools, so the APK could
-  not be built locally — CI (ubuntu-latest) builds it correctly.
+6. Resize `store/screenshots/*.png` to 1080×1920 for Play Store
+   (per `store/graphics_specs.md`)

@@ -26,12 +26,28 @@ _Last updated: 2026-10-09_
 - Timer showed fractional seconds (`19:55.96`)
 - Duplicate `ic_launcher_background` resource broke the Gradle build
 - Icon generation wired into CI (`scripts/generate-icons.mjs`)
+- Raw APK now attached to GitHub **Release** `debug-apk` (no zip wrapper —
+  the zip wrapper was the likely cause of "tap → nothing happens")
+- AdMob now statically imported (rewarded ads actually work on Android)
+- Boot error boundary: any startup crash now shows a visible message
 
 ## 🔗 Links
 
 - Repo: https://github.com/ravi9689370-oss/questhabit
 - Live web app: https://ravi9689370-oss.github.io/questhabit/
-- APK artifact: Actions → "Build Android Debug APK" → Artifacts → app-debug-apk
+- **APK (direct download, no zip):**
+  https://github.com/ravi9689370-oss/questhabit/releases/download/debug-apk/app-debug.apk
+- APK artifact (zip): Actions → "Build Android Debug APK" → Artifacts
+
+## 📲 Install on phone (if app "removes itself" / won't open)
+
+1. Use the **Release link above** — NOT the Actions artifact (that's a zip)
+2. Allow **Install from unknown sources** when Android asks
+3. **Uninstall any old QuestHabit debug build first** (signature conflict
+   shows as "App not installed" / instant close)
+4. If it still closes instantly: which phone/Android version? The app
+   needs Android 8+ (WebView 100+). Now has a visible boot error screen
+   — screenshot the message if it appears.
 
 ## 🔧 Manual steps (only you can do these)
 

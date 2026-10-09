@@ -25,6 +25,24 @@ npm run build      # production build -> dist/
 npm run preview    # preview production build
 ```
 
+## 📲 Install the APK on your phone
+
+**Direct download (no zip):**
+**https://github.com/ravi9689370-oss/questhabit/releases/download/debug-apk/app-debug.apk**
+
+Steps:
+1. Open the link above on your phone → download `app-debug.apk`
+2. Android will ask for permission → allow **"Install from unknown sources"**
+   (Chrome: Settings → Sites → Install unknown apps → Allow)
+3. Tap the downloaded file in **Downloads** → **Install**
+4. ⚠️ If you installed an older debug build before, **uninstall it first**
+   (debug builds from different machines have different signatures →
+   "App not installed" otherwise)
+5. Open QuestHabit from the app drawer
+
+**Note:** the GitHub Actions *artifact* is a ZIP — use the **Release**
+link above instead (raw .apk, one tap install).
+
 ## 📱 Android (Capacitor)
 
 ```bash
@@ -33,7 +51,10 @@ npx cap add android     # first time only
 npx cap open android    # open in Android Studio, run on device
 ```
 
-Debug APK is also built automatically by GitHub Actions (`.github/workflows/android.yml`) and uploaded as an artifact named `app-debug-apk`.
+Debug APK is also built automatically by GitHub Actions
+(`.github/workflows/android.yml`) and attached to the
+**"Debug APK (latest)"** Release + uploaded as an artifact named
+`app-debug-apk`.
 
 ## 🌐 GitHub Pages
 

@@ -52,19 +52,30 @@ for (const [dpi, mult] of Object.entries(DENSITIES)) {
 }
 
 // 3. Adaptive icon background color → navy (matches icon bg)
+// The Capacitor template may define ic_launcher_background in either
+// values/ic_launcher_background.xml or values/colors.xml — update both safely.
 const valuesDir = join(resDir, 'values');
 mkdirSync(valuesDir, { recursive: true });
-const colorsPath = join(valuesDir, 'colors.xml');
-let colors = existsSync(colorsPath) ? readFileSync(colorsPath, 'utf8') : '';
-if (colors.includes('ic_launcher_background')) {
-  colors = colors.replace(/<color name="ic_launcher_background">.*?<\/color>/,
-    '<color name="ic_launcher_background">#10131a</color>');
-} else {
-  colors = colors.replace('</resources>', '  <color name="ic_launcher_background">#10131a</color>\n</resources>');
-  if (!colors.includes('</resources>')) {
-    colors = `<?xml version="1.0" encoding="utf-8"?>\n<resources>\n  <color name="ic_launcher_background">#10131a</color>\n</resources>\n`;
+
+function setColorIn(file, color) {
+  const p = join(valuesDir, file);
+  if (!existsSync(p)) return false;
+  let xml = readFileSync(p, 'utf8');
+  if (xml.includes('ic_launcher_background')) {
+    xml = xml.replace(
+      /<color name="ic_launcher_background">.*?<\/color>/,
+      `<color name="ic_launcher_background">${color}</color>`
+    );
+  } else {
+    xml = xml.replace('</resources>', `  <color name="ic_launcher_background">${color}</color>\n</resources>`);
   }
+  writeFileSync(p, xml);
+  return true;
 }
-writeFileSync(colorsPath, colors);
-console.log('colors.xml: ic_launcher_background = #10131a');
+
+const BG = '#10131a';
+if (!setColorIn('ic_launcher_background.xml', BG)) {
+  setColorIn('colors.xml', BG);
+}
+console.log('launcher background = ' + BG);
 console.log('Icons generated ✔');

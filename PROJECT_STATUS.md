@@ -22,9 +22,9 @@ _Last updated: 2026-10-09_
 
 ## ⏳ Pending (CI / manual)
 
-- [ ] Push to GitHub → verify Pages deploy
-- [ ] Verify APK artifact builds in Actions
-- [ ] Play Console submission pack (`store/`) — in progress
+- [ ] GitHub Actions: Pages deploy + APK artifact (auto-run on push)
+- [ ] Enable Pages in repo settings if auto-deploy doesn't trigger
+- [ ] Play Console submission pack (`store/`) — done, awaiting your console clicks
 
 ## 🔧 Manual steps (only you can do these)
 

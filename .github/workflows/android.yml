@@ -31,7 +31,7 @@ jobs:
       - name: Generate CI test keystore
         run: |
           keytool -genkeypair -v \
-            -keystore android/ci-test.keystore \
+            -keystore android/app/ci-test.keystore \
             -alias ci-test \
             -keyalg RSA -keysize 2048 -validity 10000 \
             -storepass questhabit -keypass questhabit \

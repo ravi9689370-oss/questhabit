@@ -28,7 +28,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         try {
             super.onResume();
         } catch (Throwable t) {
@@ -38,7 +38,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         try {
             super.onStart();
         } catch (Throwable t) {

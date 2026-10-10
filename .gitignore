@@ -8,3 +8,4 @@ dist
 android/key.properties
 android/release.keystore
 android/app/release.keystore
+android/ci-test.keystore

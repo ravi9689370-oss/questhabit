@@ -23,6 +23,25 @@ jobs:
       - run: npx cap sync android
       # adaptive launcher icons for every density
       - run: node scripts/generate-icons.mjs
+      # Ephemeral test keystore: the release signingConfig needs a
+      # real keystore file. A fresh runner has no ~/.android/debug.keystore
+      # yet, so generate one with keytool. This is a THROWAWAY test
+      # key — for production, generate your own persistent keystore and
+      # keep it safe (losing it blocks app updates forever).
+      - name: Generate CI test keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore android/ci-test.keystore \
+            -alias ci-test \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass questhabit -keypass questhabit \
+            -dname "CN=QuestHabit, O=QuestHabit, C=IN"
+          cat > android/key.properties <<EOF
+          STORE_FILE=ci-test.keystore
+          STORE_PASSWORD=questhabit
+          KEY_ALIAS=ci-test
+          KEY_PASSWORD=questhabit
+          EOF
       # Capacitor 8.x requires JDK 21 (its libraries compile with
       # sourceCompatibility 21; JDK 17 fails with "invalid source release: 21")
       - uses: actions/setup-java@v4

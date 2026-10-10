@@ -43,18 +43,55 @@ Steps:
 **Note:** the GitHub Actions *artifact* is a ZIP — use the **Release**
 link above instead (raw .apk, one tap install).
 
+### If the app still force-closes (crash diagnosis)
+
+Capture the native crash log — this pinpoints the exact cause:
+
+```bash
+# phone connected via USB with USB debugging on
+adb logcat *:E | grep -iE "questhabit|capacitor|androidruntime"
+```
+
+Or: developer options → "Bug report" / "Take bug report" → share the
+`AndroidRuntime` FATAL EXCEPTION lines.
+
+The app now has three safety nets:
+1. `MainActivity` catches startup exceptions → shows an error dialog
+2. Web bundle failure → visible red error overlay (not a blank page)
+3. `boot()` wrapped in try/catch with a reload button
+
+Send the error text/screenshot and it will be fixed.
+
 ## 📱 Android (Capacitor)
 
 ```bash
 npm run build:android   # build web + sync capacitor config
-npx cap add android     # first time only
+npx cap sync android    # sync (android/ is committed)
 npx cap open android    # open in Android Studio, run on device
 ```
 
-Debug APK is also built automatically by GitHub Actions
-(`.github/workflows/android.yml`) and attached to the
-**"Debug APK (latest)"** Release + uploaded as an artifact named
-`app-debug-apk`.
+APKs are built automatically by GitHub Actions
+(`.github/workflows/android.yml`):
+- **debug APK** → artifact `app-debug-apk` + attached to the
+  `debug-apk` GitHub Release (raw download)
+- **release APK** → artifact `app-release-apk`
+
+Both are signed with an **ephemeral CI test keystore** (throwaway,
+regenerated each run). For a **production release**, generate your
+own persistent keystore:
+
+```bash
+keytool -genkeypair -v -keystore android/app/release.keystore \
+  -alias questhabit -keyalg RSA -keysize 2048 -validity 10000
+# then create android/key.properties:
+# STORE_FILE=release.keystore
+# STORE_PASSWORD=<your-password>
+# KEY_ALIAS=questhabit
+# KEY_PASSWORD=<your-password>
+```
+
+**⚠️ Back up release.keystore + key.properties somewhere safe —
+losing them means you can never ship an app update again.**
 
 ## 🌐 GitHub Pages
 

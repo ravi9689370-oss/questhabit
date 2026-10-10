@@ -17,7 +17,7 @@ _Last updated: 2026-10-09_
       ratings, audience, ads, access, declarations, graphics specs, console
       checklist) + 7 real app screenshots + 512px icon
 
-## 🐛 Bugs found & fixed (2026-10-09)
+## 🐛 Bugs found & fixed (2026-10-09/10)
 
 - Router had no `:param` matching → workout screen 404'd (headline feature broken)
 - Rest overlay CSS overrode `hidden` → blocked ALL workout button taps
@@ -30,6 +30,22 @@ _Last updated: 2026-10-09_
   the zip wrapper was the likely cause of "tap → nothing happens")
 - AdMob now statically imported (rewarded ads actually work on Android)
 - Boot error boundary: any startup crash now shows a visible message
+- **Crash-proof `MainActivity`**: onCreate/onStart/onResume wrapped in
+  try/catch → visible error dialog instead of silent force-close
+  (`showFatalError` verified inside APK classes13.dex)
+- **Release signing**: ephemeral CI test keystore via keytool
+  (fixes `validateSigningRelease` "debug.keystore not found")
+- **R8/ProGuard**: `minifyEnabled` + `shrinkResources` explicitly false
+  for BOTH debug and release; keep-rules added for Capacitor/plugins/AdMob
+- **JDK 21 required** for Capacitor 8.x (JDK 17 → "invalid source release: 21")
+- `onResume`/`onStart` must be `public` (BridgeActivity visibility)
+- Web bundle failure → visible red error overlay (index.html)
+
+## 📊 CI (both APKs)
+
+- `assembleDebug` → artifact `app-debug-apk` + Release `debug-apk`
+- `assembleRelease` → artifact `app-release-apk` (6.7 MB)
+- JDK: zulu 21 · Gradle cache · icons generated in CI
 
 ## 🔗 Links
 
@@ -37,7 +53,7 @@ _Last updated: 2026-10-09_
 - Live web app: https://ravi9689370-oss.github.io/questhabit/
 - **APK (direct download, no zip):**
   https://github.com/ravi9689370-oss/questhabit/releases/download/debug-apk/app-debug.apk
-- APK artifact (zip): Actions → "Build Android Debug APK" → Artifacts
+- APK artifacts: Actions → "Build Android APKs" → app-debug-apk / app-release-apk
 
 ## 📲 Install on phone (if app "removes itself" / won't open)
 
@@ -57,8 +73,17 @@ _Last updated: 2026-10-09_
 4. **Closed testing**: new personal accounts need min testers × min days before
    production — verify current numbers at
    https://support.google.com/googleplay/android-developer/answer/9859455
-5. **Signed AAB for production** (debug APK is for testing only):
-   generate upload keystore, add signing to `android/app/build.gradle`,
-   `./gradlew bundleRelease` → upload AAB. **BACK UP keystore + passwords.**
+5. **Signed AAB for production** (CI APKs use a throwaway
+   test keystore — fine for testing, NOT for Play Store):
+   ```
+   keytool -genkeypair -v -keystore android/app/release.keystore \
+     -alias questhabit -keyalg RSA -keysize 2048 -validity 10000
+   # android/key.properties:
+   # STORE_FILE=release.keystore
+   # STORE_PASSWORD=<pw> / KEY_ALIAS=questhabit / KEY_PASSWORD=<pw>
+   # then locally: cd android && ./gradlew bundleRelease
+   ```
+   **BACK UP release.keystore + key.properties — losing them
+   blocks all future updates.**
 6. Resize `store/screenshots/*.png` to 1080×1920 for Play Store
    (per `store/graphics_specs.md`)
